@@ -25,3 +25,8 @@ body {
     text-wrap: balance;
   }
 }
+
+.welcome-page {
+
+  background-image: url('/images/31.png');
+}
