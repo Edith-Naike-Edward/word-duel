@@ -4,6 +4,8 @@ import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Head from 'next/head';  // Import the Head component
 import { useRouter } from "next/navigation";
+import Starfield from './starfield';
+
 
 // Types for siblings
 type Sibling = 'Tony' | 'Abby' | 'Andy';
@@ -31,15 +33,17 @@ export default function WelcomePage() {
       <Head>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <h1 className="text-5xl font-bold text-gray-800">Word Duel</h1>
-      <h2 className="text-2xl text-gray-600 mt-4">Welcome to Word Duel!</h2>
-      <p className="text-lg text-gray-500 mt-2 mb-8">Choose your sibling.</p>
+      <Starfield className="absolute inset-0 z-0 " /> 
+      {/* Add Starfield Component */}
+      <h1 className="text-5xl font-bold text-white z-10">Trivia Duel</h1>
+      <h2 className="text-2xl text-white mt-4 z-10">Welcome to Trivia Duel!</h2>
+      <p className="text-lg text-purple-100 mt-2 mb-8 z-10">Choose your sibling based on your level of difficulty.</p>
 
       <div className="flex space-x-8">
         {/* Tony */}
         <div
           onClick={() => chooseSibling('Tony')}
-          className="flex flex-col items-center cursor-pointer p-4 bg-white rounded-lg shadow-md hover:scale-105 transform transition duration-300"
+          className="flex flex-col items-center cursor-pointer p-4 bg-indigo-200 rounded-lg shadow-md hover:scale-105 transform transition duration-300"
         >
           <Image src="/images/tony.jpg" alt="Tony" width={150} height={150} />
           <p className="mt-2 text-lg font-medium">Tony</p>
@@ -48,7 +52,7 @@ export default function WelcomePage() {
         {/* Abby */}
         <div
           onClick={() => chooseSibling('Abby')}
-          className="flex flex-col items-center cursor-pointer p-4 bg-white rounded-lg shadow-md hover:scale-105 transform transition duration-300"
+          className="flex flex-col items-center cursor-pointer p-4 bg-indigo-300 rounded-lg shadow-md hover:scale-105 transform transition duration-300"
         >
           <Image src="/images/abby.jpg" alt="Abby" width={150} height={150} />
           <p className="mt-2 text-lg font-medium">Abby</p>
@@ -57,7 +61,7 @@ export default function WelcomePage() {
         {/* Andy */}
         <div
           onClick={() => chooseSibling('Andy')}
-          className="flex flex-col items-center cursor-pointer p-4 bg-white rounded-lg shadow-md hover:scale-105 transform transition duration-300"
+          className="flex flex-col items-center cursor-pointer p-4 bg-indigo-400 rounded-lg shadow-md hover:scale-105 transform transition duration-300"
         >
           <Image src="/images/andy.jpg" alt="Andy" width={150} height={150} />
           <p className="mt-2 text-lg font-medium">Andy</p>
