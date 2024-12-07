@@ -4,7 +4,6 @@ import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
 import DOMPurify from 'dompurify';
 import Confetti from 'react-confetti';
-import Starfield from '../../starfield';
 
 // Define sibling type
 type Sibling = 'tony' | 'abby' | 'andy';
@@ -173,17 +172,29 @@ export default function SiblingGamePage() {
       setLoading(false); // Stop loading regardless of success or failure
     }
   };
+
   
 
-  // Fetch data on component mount
-  useEffect(() => {
-    fetchData();
+  // // Fetch data on component mount
+  // useEffect(() => {
+  //   fetchData();
 
-    // Validate sibling
-    if (!sibling || !isValidSibling(sibling)) {
-      router.push('/'); // Redirect to the home page if invalid sibling
+  //   // Validate sibling
+  //   if (!sibling || !isValidSibling(sibling)) {
+  //     router.push('/'); // Redirect to the home page if invalid sibling
+  //   }
+  // }, [sibling, router]);
+
+  useEffect(() => {
+    if (questions.length === 0) {
+      fetchData();
     }
-  }, [sibling, router]);
+  
+    if (!sibling || !isValidSibling(sibling)) {
+      router.push('/');
+    }
+  }, [sibling, router, questions.length]);
+  
 
    // Timer countdown logic
    useEffect(() => {
@@ -262,9 +273,9 @@ export default function SiblingGamePage() {
       </div>
 
       {loading ? (
-        <p>Loading questions...</p>
+        <p className="text-white">Loading questions...</p>
         ) : questions.length === 0 ? (
-            <p>No questions available</p>
+            <p className="text-white">No questions available</p>
         ) : (
         <>
           {/* <h1 className="text-4xl font-bold">Game for {sibling.charAt(0).toUpperCase() + sibling.slice(1)}</h1> */}
@@ -272,13 +283,13 @@ export default function SiblingGamePage() {
               <div className="text-center">
               <h2 className="mt-4 text-white font-bold">Your score is {score}/{questions.length}</h2>
               <button
-                onClick={() => router.push('/game/[sibling]')}  // Navigate to the home page or a different page
+                onClick={() => router.push('/game/${sibling}')}  // Navigate to the home page or a different page
                 className="mt-6 px-8 mx-2 py-2 bg-indigo-600 text-white rounded-lg hover:bg-blue-600"
               >
                 Play Again
               </button>
               <button
-                onClick={() => router.push('/game/[sibling]/settings')}  // Navigate to the select difficulty page
+                onClick={() => router.push('/game/${sibling}/settings')}  // Navigate to the settings page
                 className="mt-6 px-6 mx-2 py-2 bg-indigo-600 text-white rounded-lg hover:bg-blue-600"
               >
                 Change Settings
@@ -286,34 +297,43 @@ export default function SiblingGamePage() {
             </div>
           
           ) : (
-            <div className="mt-4 text-white text-lg text-bold font-bold">
+            <div className="mt-2 text-white text-lg text-bold font-bold">
               <p>Time remaining: {timeLeft}s</p>
-              <p>{`Question ${currentQuestionIndex + 1} of ${questions.length}`}</p>
-              <h2
-                dangerouslySetInnerHTML={{
-                  __html: DOMPurify.sanitize(questions[currentQuestionIndex]?.question || ''),
-                }}
-                className="text-white px-0 p-2 text-semibold text-lg"
-              />
+              <p className="text-white">{`Question ${currentQuestionIndex + 1} of ${questions.length}`}</p>
+              <div className="mt-0">
+                <h2
+                  dangerouslySetInnerHTML={{
+                    __html: DOMPurify.sanitize(questions[currentQuestionIndex]?.question || ''),
+                  }}
+                  className="text-white px-0 p-2 text-semibold text-lg"
+                />
+                <ul className="list-disc list-inside">
+                  {[questions[currentQuestionIndex].correct_answer, ...questions[currentQuestionIndex].incorrect_answers].map((option, index) => (
+                    <li key={index} className="text-white">{`${index + 1}. ${option}`}</li>
+                  ))}
+                </ul>
+              </div>
               <input
                 type="text"
                 value={userAnswer}
                 onChange={(e) => setUserAnswer(e.target.value)}
                 placeholder="Type your answer here"
                 // className="mt-2 p-2 border rounded-lg text-white"
-                className="mt-4 mx-2 px-40 p-2 border rounded-lg bg-gray-800 text-white placeholder-gray-400"
+                className="mt-0 mx-2 px-40 p-2 border rounded-lg bg-gray-800 text-white placeholder-gray-400"
               />
-              {feedback && (
-                <div
-                    className={`mt-2 text-center p-3 ${feedback === 'Correct!' ? 'text-green-500' : 'text-red-500'}`}
-                >
-                  {feedback}
-                </div>
-              )}
+              {/* <div className="min-h-[30px]"> */}
+                {feedback && (
+                  <div
+                      className={`mt-0 text-center p-2 ${feedback === 'Correct!' ? 'text-green-500' : 'text-red-500'}`}
+                  >
+                    {feedback}
+                  </div>
+                )}
+              {/* </div> */}
               <button
                 onClick={handleSubmit}
                 disabled={!userAnswer.trim()}
-                className={`mt-6 mx-2 px-10 py-2 bg-indigo-600 text-white rounded-lg ${!userAnswer.trim() ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-600 '}`}
+                className={`mt-0 mx-2 px-10 py-2 bg-indigo-600 text-white rounded-lg ${!userAnswer.trim() ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-600 '}`}
               >
                 Submit
               </button>

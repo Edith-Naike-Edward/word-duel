@@ -131,27 +131,33 @@ const DifficultySelectionPage = () => {
     }, 10000);
   };
 
-  const handleGuessChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setGuess(e.target.value);
-  };
 
-  
   // const fetchData = async () => {
   //   try {
-  //     const res = await fetch('http://localhost:5000/api/questions?difficulty=${difficulty}');
+  //     const res = await fetch("http://localhost:5000/api/questions?difficulty=${difficulty}");
   //     if (!res.ok) {
-  //       throw new Error('Failed to fetch data from the API');
+  //       throw new Error("Failed to fetch data from the API");
   //     }
   //     const data: Question[] = await res.json();
-  //     setQuestions(data);
+  
+  //     // Decode the question and answers for each question
+  //     const decodedQuestions = data.map((q) => ({
+  //       ...q,
+  //       question: decodeHtmlEntities(q.question),
+  //       correct_answer: decodeHtmlEntities(q.correct_answer),
+  //       incorrect_answers: q.incorrect_answers.map(decodeHtmlEntities),
+  //     }));
+  
+  //     console.log(decodedQuestions); // Verify structure of the data
+  //     setQuestions(decodedQuestions);
   //   } catch (error) {
-  //     console.error('Error fetching data:', error);
-  //     setQuestions([]);
+  //     console.error("Error fetching data:", error);
+  //     setQuestions([]); // Reset questions to an empty array
   //   } finally {
-  //     setLoading(false);
+  //     setLoading(false); // Stop loading regardless of success or failure
   //   }
   // };
-
+  
   const fetchData = async () => {
     try {
       const res = await fetch("http://localhost:5000/api/questions?difficulty=${difficulty}");
@@ -177,7 +183,6 @@ const DifficultySelectionPage = () => {
       setLoading(false); // Stop loading regardless of success or failure
     }
   };
-  
 
   useEffect(() => {
     fetchData();
@@ -258,9 +263,9 @@ const DifficultySelectionPage = () => {
       </div>
 
       {loading ? (
-        <p>Loading questions...</p>
+        <p className='text-white font-bold'>Loading questions...</p>
       ) : questions.length === 0 ? (
-        <p>No questions available</p>
+        <p className='text-white'>No questions available</p>
       ) : (
         <>
           {showScore ? (
@@ -268,50 +273,60 @@ const DifficultySelectionPage = () => {
               <h2 className="mt-4 text-white font-bold">Game Over</h2>
               <h2 className="mt-4 text-white font-bold">Your score is {score}/{questions.length}</h2>
               <button
-                onClick={() => router.push('/')}
+                onClick={() => router.push('/game/${sibling}/difficulty/${difficulty}?time=${numericTime}`') }
                 className="mt-6 px-8 mx-2 py-2 bg-indigo-600 text-white rounded-lg hover:bg-blue-600"
               >
                 Play Again
               </button>
               <button
-                onClick={() => router.push('/game/[sibling]/settings')}
+                onClick={() => router.push('/game/${sibling}/settings')}
                 className="mt-6 px-6 mx-2 py-2 bg-indigo-600 text-white rounded-lg hover:bg-blue-600"
               >
                 Change Settings
               </button>
             </div>
           ) : (
-            <div className="mt-4 text-white text-lg text-bold font-bold">
+            <div className="mt-2 text-white text-lg text-bold font-bold">
               <p className="text-white mb-4">Difficulty: {difficulty}</p>
               <p>Time remaining: {timeLeft}s</p>
-              <p>{`Question ${currentQuestionIndex + 1} of ${questions.length}`}</p>
-              <div className="w-3/4 mx-auto mt-6">
-                <h2 className="text-xl font-semibold mb-4">
-                  {DOMPurify.sanitize(questions[currentQuestionIndex]?.question || '')}
-                </h2>
-                <input
-                  type="text"
-                  placeholder="Your answer"
-                  value={userAnswer}
-                  onChange={(e) => setUserAnswer(e.target.value)}
-                  className="w-full text-black p-3 rounded-md"
+              {/* <p>Time remaining: {timeLeft}s</p> */}
+              <p className="text-white">{`Question ${currentQuestionIndex + 1} of ${questions.length}`}</p>
+              <div className="mt-0">
+                <h2
+                  dangerouslySetInnerHTML={{
+                    __html: DOMPurify.sanitize(questions[currentQuestionIndex]?.question || ''),
+                  }}
+                  className="text-white px-0 p-2 text-semibold text-lg"
                 />
-                {feedback && (
-                  <div
-                    className={`mt-4 text-center p-3 ${feedback === 'Correct!' ? 'text-green-500' : 'text-red-500'}`}
-                  >
-                    {feedback}
-                  </div>
-                )}
-                <div className="flex justify-center mt-6">
-                  <button
-                    onClick={handleSubmit}
-                    className="px-8 py-2 mx-2 bg-indigo-600 text-white rounded-lg hover:bg-blue-600"
-                  >
-                    Submit
-                  </button>
-                </div>
+                <ul className="list-disc list-inside">
+                  {[questions[currentQuestionIndex].correct_answer, ...questions[currentQuestionIndex].incorrect_answers].map((option, index) => (
+                    <li key={index} className="text-white">{`${index + 1}. ${option}`}</li>
+                  ))}
+                </ul>
               </div>
+              <input
+                type="text"
+                value={userAnswer}
+                onChange={(e) => setUserAnswer(e.target.value)}
+                placeholder="Type your answer here"
+                // className="mt-2 p-2 border rounded-lg text-white"
+                className="mt-0 mx-2 px-40 p-2 border rounded-lg bg-gray-800 text-white placeholder-gray-400"
+              />
+              {feedback && (
+                <div
+                    className={`mt-0 text-center p-2 ${feedback === 'Correct!' ? 'text-green-500' : 'text-red-500'}`}
+                >
+                  {feedback}
+                </div>
+              )}
+              <button
+                onClick={handleSubmit}
+                disabled={!userAnswer.trim()}
+                className={`mt-0 mx-2 px-10 py-2 bg-indigo-600 text-white rounded-lg ${!userAnswer.trim() ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-600 '}`}
+              >
+                Submit
+              </button>
+              {/* {feedback && <p className="mt-4 text-lg text-white">{feedback}</p>} */}
             </div>
           )}
         </>
